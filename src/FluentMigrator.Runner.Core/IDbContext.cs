@@ -1,8 +1,8 @@
-using System.Data.Common;
+using System.Data;
 
 namespace FluentMigrator.Runner;
 
 public interface IDbContext
 {
-    public DbConnection CreateConnection();
+    public IDbConnection CreateConnection();
 }

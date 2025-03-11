@@ -37,18 +37,18 @@ namespace FluentMigrator.Tests.Unit.Processors
 
         private ConnectionState _connectionState;
 
-        protected Mock<DbConnection> MockedConnection { get; private set; }
+        protected Mock<IDbConnection> MockedConnection { get; private set; }
         protected Mock<IDbContext> MockedIDbContext { get; private set; }
         protected Mock<IConnectionStringAccessor> MockedConnectionStringAccessor { get; private set; }
-        protected List<Mock<DbCommand>> MockedCommands { get; private set; }
+        protected List<Mock<IDbCommand>> MockedCommands { get; private set; }
 
         [SetUp]
         public void SetUp()
         {
             _connectionState = ConnectionState.Closed;
 
-            MockedCommands = new List<Mock<DbCommand>>();
-            MockedConnection = new Mock<DbConnection>(MockBehavior.Loose);
+            MockedCommands = new List<Mock<IDbCommand>>();
+            MockedConnection = new Mock<IDbConnection>(MockBehavior.Loose);
             MockedIDbContext = new Mock<IDbContext>(MockBehavior.Loose);
             MockedConnectionStringAccessor = new Mock<IConnectionStringAccessor>(MockBehavior.Loose);
 
@@ -56,7 +56,7 @@ namespace FluentMigrator.Tests.Unit.Processors
             MockedConnection.Setup(conn => conn.Open()).Callback(() => _connectionState = ConnectionState.Open);
             MockedConnection.Setup(conn => conn.Close()).Callback(() => _connectionState = ConnectionState.Closed);
             MockedConnection.SetupProperty(conn => conn.ConnectionString);
-            MockedConnection.Protected().Setup("Dispose", ItExpr.IsAny<bool>());
+            MockedConnection.Setup(conn => conn.Dispose());
 
             MockedConnectionStringAccessor.SetupGet(a => a.ConnectionString).Returns(ConnectionString);
 
@@ -67,13 +67,13 @@ namespace FluentMigrator.Tests.Unit.Processors
                 .Returns(
                     () =>
                     {
-                        var commandMock = new Mock<DbCommand>(MockBehavior.Loose);
+                        var commandMock = new Mock<IDbCommand>(MockBehavior.Loose);
                         commandMock
                             .SetupSet(cmd => cmd.CommandText = It.IsAny<string>());
                         commandMock.Setup(cmd => cmd.ExecuteNonQuery()).Returns(1);
-                        commandMock.Protected().SetupGet<DbConnection>("DbConnection").Returns(MockedConnection.Object);
-                        commandMock.Protected().SetupSet<DbConnection>("DbConnection", ItExpr.Is<DbConnection>(v => v == MockedConnection.Object));
-                        commandMock.Protected().Setup("Dispose", ItExpr.IsAny<bool>());
+                        commandMock.SetupGet(c => c.Connection).Returns(MockedConnection.Object);
+                        commandMock.SetupSet(c => c.Connection = It.Is<IDbConnection>(v => v == MockedConnection.Object));
+                        commandMock.Setup(c => c.Dispose());
                         MockedCommands.Add(commandMock);
                         return commandMock.Object;
                     });
@@ -109,10 +109,10 @@ namespace FluentMigrator.Tests.Unit.Processors
                 mockedCommand.VerifySet(cmd => cmd.Connection = MockedConnection.Object);
                 mockedCommand.VerifySet(cmd => cmd.CommandText = command);
                 mockedCommand.Verify(cmd => cmd.ExecuteNonQuery());
-                mockedCommand.Protected().Verify("Dispose", Times.Exactly(1), ItExpr.IsAny<bool>());
+                mockedCommand.Verify(c => c.Dispose(), Times.Exactly(1));
             }
 
-            MockedConnection.Protected().Verify("Dispose", Times.Exactly(1), ItExpr.IsAny<bool>());
+            MockedConnection.Verify(c => c.Dispose(), Times.Exactly(1));
         }
 
         [Test]
@@ -133,10 +133,10 @@ namespace FluentMigrator.Tests.Unit.Processors
                 mockedCommand.VerifySet(cmd => cmd.Connection = MockedConnection.Object);
                 mockedCommand.VerifySet(cmd => cmd.CommandText = command);
                 mockedCommand.Verify(cmd => cmd.ExecuteNonQuery());
-                mockedCommand.Protected().Verify("Dispose", Times.Exactly(1), ItExpr.IsAny<bool>());
+                mockedCommand.Verify(c => c.Dispose(), Times.Exactly(1));
             }
 
-            MockedConnection.Protected().Verify("Dispose", Times.Exactly(1), ItExpr.IsAny<bool>());
+            MockedConnection.Verify(c => c.Dispose(), Times.Exactly(1));
         }
 
         [Test]
@@ -157,10 +157,10 @@ namespace FluentMigrator.Tests.Unit.Processors
                 mockedCommand.VerifySet(cmd => cmd.Connection = MockedConnection.Object);
                 mockedCommand.VerifySet(cmd => cmd.CommandText = command);
                 mockedCommand.Verify(cmd => cmd.ExecuteNonQuery());
-                mockedCommand.Protected().Verify("Dispose", Times.Exactly(1), ItExpr.IsAny<bool>());
+                mockedCommand.Verify(c => c.Dispose(), Times.Exactly(1));
             }
 
-            MockedConnection.Protected().Verify("Dispose", Times.Exactly(1), ItExpr.IsAny<bool>());
+            MockedConnection.Verify(c => c.Dispose(), Times.Exactly(1));
         }
 
         [Test]
@@ -181,10 +181,10 @@ namespace FluentMigrator.Tests.Unit.Processors
                 mockedCommand.VerifySet(cmd => cmd.Connection = MockedConnection.Object);
                 mockedCommand.VerifySet(cmd => cmd.CommandText = command);
                 mockedCommand.Verify(cmd => cmd.ExecuteNonQuery());
-                mockedCommand.Protected().Verify("Dispose", Times.Exactly(1), ItExpr.IsAny<bool>());
+                mockedCommand.Verify(c => c.Dispose(), Times.Exactly(1));
             }
 
-            MockedConnection.Protected().Verify("Dispose", Times.Exactly(1), ItExpr.IsAny<bool>());
+            MockedConnection.Verify(c => c.Dispose(), Times.Exactly(1));
         }
 
         [Test]
@@ -205,10 +205,10 @@ namespace FluentMigrator.Tests.Unit.Processors
                 mockedCommand.VerifySet(cmd => cmd.Connection = MockedConnection.Object);
                 mockedCommand.VerifySet(cmd => cmd.CommandText = command);
                 mockedCommand.Verify(cmd => cmd.ExecuteNonQuery());
-                mockedCommand.Protected().Verify("Dispose", Times.Exactly(1), ItExpr.IsAny<bool>());
+                mockedCommand.Verify(c => c.Dispose(), Times.Exactly(1));
             }
 
-            MockedConnection.Protected().Verify("Dispose", Times.Exactly(1), ItExpr.IsAny<bool>());
+            MockedConnection.Verify(c => c.Dispose(), Times.Exactly(1));
         }
 
         [Test]
@@ -229,10 +229,10 @@ namespace FluentMigrator.Tests.Unit.Processors
                 mockedCommand.VerifySet(cmd => cmd.Connection = MockedConnection.Object);
                 mockedCommand.VerifySet(cmd => cmd.CommandText = command);
                 mockedCommand.Verify(cmd => cmd.ExecuteNonQuery());
-                mockedCommand.Protected().Verify("Dispose", Times.Exactly(1), ItExpr.IsAny<bool>());
+                mockedCommand.Verify(c => c.Dispose(), Times.Exactly(1));
             }
 
-            MockedConnection.Protected().Verify("Dispose", Times.Exactly(1), ItExpr.IsAny<bool>());
+            MockedConnection.Verify(c => c.Dispose(), Times.Exactly(1));
         }
 
         [Test]
@@ -262,10 +262,10 @@ namespace FluentMigrator.Tests.Unit.Processors
                 mockedCommand.VerifySet(cmd => cmd.Connection = MockedConnection.Object);
                 mockedCommand.VerifySet(cmd => cmd.CommandText = command);
                 mockedCommand.Verify(cmd => cmd.ExecuteNonQuery(), Times.Exactly(count));
-                mockedCommand.Protected().Verify("Dispose", Times.Exactly(1), ItExpr.IsAny<bool>());
+                mockedCommand.Verify(c => c.Dispose(), Times.Exactly(1));
             }
 
-            MockedConnection.Protected().Verify("Dispose", Times.Exactly(1), ItExpr.IsAny<bool>());
+            MockedConnection.Verify(c => c.Dispose(), Times.Exactly(1));
         }
 
         protected abstract IMigrationProcessor CreateProcessor();

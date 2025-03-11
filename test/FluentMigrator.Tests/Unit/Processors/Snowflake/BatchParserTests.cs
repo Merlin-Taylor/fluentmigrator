@@ -29,7 +29,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 using Moq;
-using Moq.Protected;
 
 using NUnit.Framework;
 
@@ -101,10 +100,10 @@ namespace FluentMigrator.Tests.Unit.Processors.Snowflake
                 mockedCommand.VerifySet(cmd => cmd.Connection = MockedConnection.Object);
                 mockedCommand.VerifySet(cmd => cmd.CommandText = command);
                 mockedCommand.Verify(cmd => cmd.ExecuteNonQuery(), Times.Exactly(1));
-                mockedCommand.Protected().Verify("Dispose", Times.Exactly(1), ItExpr.IsAny<bool>());
+                mockedCommand.Verify(c => c.Dispose(), Times.Exactly(1));
             }
 
-            MockedConnection.Protected().Verify("Dispose", Times.Exactly(1), ItExpr.IsAny<bool>());
+            MockedConnection.Verify(c => c.Dispose(), Times.Exactly(1));
         }
 
         [Test]
