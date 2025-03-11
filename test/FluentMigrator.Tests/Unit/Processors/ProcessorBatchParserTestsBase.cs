@@ -63,7 +63,7 @@ namespace FluentMigrator.Tests.Unit.Processors
             MockedIDbContext.Setup(factory => factory.CreateConnection())
                 .Returns(MockedConnection.Object);
 
-            MockedIDbContext.Setup(factory => factory.CreateCommand())
+            MockedConnection.Setup(factory => factory.CreateCommand())
                 .Returns(
                     () =>
                     {
@@ -105,7 +105,7 @@ namespace FluentMigrator.Tests.Unit.Processors
 
             foreach (var mockedCommand in MockedCommands)
             {
-                MockedIDbContext.Verify(factory => factory.CreateCommand());
+                MockedConnection.Verify(factory => factory.CreateCommand());
                 mockedCommand.VerifySet(cmd => cmd.Connection = MockedConnection.Object);
                 mockedCommand.VerifySet(cmd => cmd.CommandText = command);
                 mockedCommand.Verify(cmd => cmd.ExecuteNonQuery());
@@ -129,7 +129,7 @@ namespace FluentMigrator.Tests.Unit.Processors
             {
                 var command = $"SELECT {index + 1}";
                 var mockedCommand = MockedCommands[index];
-                MockedIDbContext.Verify(factory => factory.CreateCommand());
+                MockedConnection.Verify(factory => factory.CreateCommand());
                 mockedCommand.VerifySet(cmd => cmd.Connection = MockedConnection.Object);
                 mockedCommand.VerifySet(cmd => cmd.CommandText = command);
                 mockedCommand.Verify(cmd => cmd.ExecuteNonQuery());
@@ -153,7 +153,7 @@ namespace FluentMigrator.Tests.Unit.Processors
 
             foreach (var mockedCommand in MockedCommands)
             {
-                MockedIDbContext.Verify(factory => factory.CreateCommand());
+                MockedConnection.Verify(factory => factory.CreateCommand());
                 mockedCommand.VerifySet(cmd => cmd.Connection = MockedConnection.Object);
                 mockedCommand.VerifySet(cmd => cmd.CommandText = command);
                 mockedCommand.Verify(cmd => cmd.ExecuteNonQuery());
@@ -177,7 +177,7 @@ namespace FluentMigrator.Tests.Unit.Processors
 
             foreach (var mockedCommand in MockedCommands)
             {
-                MockedIDbContext.Verify(factory => factory.CreateCommand());
+                MockedConnection.Verify(factory => factory.CreateCommand());
                 mockedCommand.VerifySet(cmd => cmd.Connection = MockedConnection.Object);
                 mockedCommand.VerifySet(cmd => cmd.CommandText = command);
                 mockedCommand.Verify(cmd => cmd.ExecuteNonQuery());
@@ -201,7 +201,7 @@ namespace FluentMigrator.Tests.Unit.Processors
 
             foreach (var mockedCommand in MockedCommands)
             {
-                MockedIDbContext.Verify(factory => factory.CreateCommand());
+                MockedConnection.Verify(factory => factory.CreateCommand());
                 mockedCommand.VerifySet(cmd => cmd.Connection = MockedConnection.Object);
                 mockedCommand.VerifySet(cmd => cmd.CommandText = command);
                 mockedCommand.Verify(cmd => cmd.ExecuteNonQuery());
@@ -225,7 +225,7 @@ namespace FluentMigrator.Tests.Unit.Processors
 
             foreach (var mockedCommand in MockedCommands)
             {
-                MockedIDbContext.Verify(factory => factory.CreateCommand());
+                MockedConnection.Verify(factory => factory.CreateCommand());
                 mockedCommand.VerifySet(cmd => cmd.Connection = MockedConnection.Object);
                 mockedCommand.VerifySet(cmd => cmd.CommandText = command);
                 mockedCommand.Verify(cmd => cmd.ExecuteNonQuery());
@@ -258,7 +258,7 @@ namespace FluentMigrator.Tests.Unit.Processors
             {
                 var (command, count) = expected[index];
                 var mockedCommand = MockedCommands[index];
-                MockedIDbContext.Verify(factory => factory.CreateCommand());
+                MockedConnection.Verify(factory => factory.CreateCommand());
                 mockedCommand.VerifySet(cmd => cmd.Connection = MockedConnection.Object);
                 mockedCommand.VerifySet(cmd => cmd.CommandText = command);
                 mockedCommand.Verify(cmd => cmd.ExecuteNonQuery(), Times.Exactly(count));

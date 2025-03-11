@@ -197,7 +197,7 @@ namespace FluentMigrator.Runner.Processors
             IDbCommand result;
             if (IDbContext != null)
             {
-                result = IDbContext.CreateCommand();
+                result = connection.CreateCommand();
                 Debug.Assert(result != null, nameof(result) + " != null");
                 result.Connection = connection;
                 if (transaction != null)

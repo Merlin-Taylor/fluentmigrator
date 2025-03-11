@@ -97,7 +97,7 @@ namespace FluentMigrator.Tests.Unit.Processors.Snowflake
             {
                 var command = expected[index];
                 var mockedCommand = MockedCommands[index];
-                MockedIDbContext.Verify(factory => factory.CreateCommand());
+                MockedConnection.Verify(factory => factory.CreateCommand());
                 mockedCommand.VerifySet(cmd => cmd.Connection = MockedConnection.Object);
                 mockedCommand.VerifySet(cmd => cmd.CommandText = command);
                 mockedCommand.Verify(cmd => cmd.ExecuteNonQuery(), Times.Exactly(1));
