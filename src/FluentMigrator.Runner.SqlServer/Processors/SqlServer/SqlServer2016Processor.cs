@@ -39,7 +39,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             [NotNull] IConnectionStringAccessor connectionStringAccessor,
             [NotNull] IServiceProvider serviceProvider)
             : this(
-                SqlClientFactory.Instance,
+                SqlClientFactory.Instance.AsDbContext(),
                 logger,
                 quoter,
                 generator,
@@ -51,7 +51,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
         /// <inheritdoc />
         protected SqlServer2016Processor(
-            [NotNull] DbProviderFactory factory,
+            [NotNull] IDbContext factory,
             [NotNull] ILogger logger,
             [NotNull] SqlServer2008Quoter quoter,
             [NotNull] SqlServer2016Generator generator,

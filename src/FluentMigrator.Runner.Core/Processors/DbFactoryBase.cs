@@ -18,7 +18,6 @@
 
 using System;
 using System.Data;
-using System.Data.Common;
 using System.Diagnostics;
 
 namespace FluentMigrator.Runner.Processors
@@ -28,9 +27,9 @@ namespace FluentMigrator.Runner.Processors
 #pragma warning restore 612
     {
         private readonly object _lock = new object();
-        private volatile DbProviderFactory _factory;
+        private volatile IDbContext _factory;
 
-        protected DbFactoryBase(DbProviderFactory factory)
+        protected DbFactoryBase(IDbContext factory)
         {
             _factory = factory;
         }
@@ -42,7 +41,7 @@ namespace FluentMigrator.Runner.Processors
         /// <summary>
         /// Gets the DB provider factory
         /// </summary>
-        public virtual DbProviderFactory Factory
+        public virtual IDbContext Factory
         {
             get
             {
@@ -60,7 +59,7 @@ namespace FluentMigrator.Runner.Processors
             }
         }
 
-        protected abstract DbProviderFactory CreateFactory();
+        protected abstract IDbContext CreateFactory();
 
         [Obsolete]
         public IDbConnection CreateConnection(string connectionString)

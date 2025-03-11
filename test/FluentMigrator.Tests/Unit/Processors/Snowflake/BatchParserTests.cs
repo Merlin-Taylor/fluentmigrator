@@ -41,7 +41,7 @@ namespace FluentMigrator.Tests.Unit.Processors.Snowflake
         protected override IMigrationProcessor CreateProcessor()
         {
             var mockedDbFactory = new Mock<SnowflakeDbFactory>(null);
-            mockedDbFactory.SetupGet(conn => conn.Factory).Returns(MockedDbProviderFactory.Object);
+            mockedDbFactory.SetupGet(conn => conn.Factory).Returns(MockedIDbContext.Object);
 
             var mockedConnStringReader = new Mock<IConnectionStringReader>();
             mockedConnStringReader.SetupGet(r => r.Priority).Returns(0);
@@ -91,13 +91,13 @@ namespace FluentMigrator.Tests.Unit.Processors.Snowflake
 
             Assert.That(MockedCommands, Has.Count.EqualTo(expected.Length));
 
-            MockedDbProviderFactory.Verify(factory => factory.CreateConnection());
+            MockedIDbContext.Verify(factory => factory.CreateConnection());
 
             for (var index = 0; index < MockedCommands.Count; index++)
             {
                 var command = expected[index];
                 var mockedCommand = MockedCommands[index];
-                MockedDbProviderFactory.Verify(factory => factory.CreateCommand());
+                MockedIDbContext.Verify(factory => factory.CreateCommand());
                 mockedCommand.VerifySet(cmd => cmd.Connection = MockedConnection.Object);
                 mockedCommand.VerifySet(cmd => cmd.CommandText = command);
                 mockedCommand.Verify(cmd => cmd.ExecuteNonQuery(), Times.Exactly(1));

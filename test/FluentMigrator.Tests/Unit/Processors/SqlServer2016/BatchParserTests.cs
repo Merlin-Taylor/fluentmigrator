@@ -18,6 +18,8 @@ using System;
 using System.Data.Common;
 using System.Linq;
 
+using FluentMigrator.Runner;
+
 using FluentMigrator.Runner.BatchParser;
 using FluentMigrator.Runner.Generators.SqlServer;
 using FluentMigrator.Runner.Initialization;
@@ -58,7 +60,7 @@ namespace FluentMigrator.Tests.Unit.Processors.SqlServer2016
                 Enumerable.Empty<IConfigureOptions<ProcessorOptions>>(),
                 Enumerable.Empty<IPostConfigureOptions<ProcessorOptions>>()));
             return new Processor(
-                MockedDbProviderFactory.Object,
+                MockedIDbContext.Object,
                 logger,
                 new SqlServer2008Quoter(),
                 new SqlServer2016Generator(),
@@ -70,7 +72,7 @@ namespace FluentMigrator.Tests.Unit.Processors.SqlServer2016
         private class Processor : SqlServer2016Processor
         {
             /// <inheritdoc />
-            public Processor([NotNull] DbProviderFactory factory, [NotNull] ILogger logger, [NotNull] SqlServer2008Quoter quoter, [NotNull] SqlServer2016Generator generator, [NotNull] IOptionsSnapshot<ProcessorOptions> options, [NotNull] IConnectionStringAccessor connectionStringAccessor, [NotNull] IServiceProvider serviceProvider)
+            public Processor([NotNull] IDbContext factory, [NotNull] ILogger logger, [NotNull] SqlServer2008Quoter quoter, [NotNull] SqlServer2016Generator generator, [NotNull] IOptionsSnapshot<ProcessorOptions> options, [NotNull] IConnectionStringAccessor connectionStringAccessor, [NotNull] IServiceProvider serviceProvider)
                 : base(factory, logger, quoter, generator, options, connectionStringAccessor, serviceProvider)
             {
             }

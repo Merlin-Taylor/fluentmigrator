@@ -35,7 +35,7 @@ namespace FluentMigrator.Runner.Processors
         private readonly string _connectionString;
 
         [NotNull, ItemCanBeNull]
-        private readonly Lazy<DbProviderFactory> _dbProviderFactory;
+        private readonly Lazy<IDbContext> _IDbContext;
 
         [NotNull, ItemCanBeNull]
         private readonly Lazy<IDbConnection> _lazyConnection;
@@ -54,7 +54,7 @@ namespace FluentMigrator.Runner.Processors
             [NotNull] IMigrationProcessorOptions options)
             : base(generator, announcer, options)
         {
-            _dbProviderFactory = new Lazy<DbProviderFactory>(() => (factory as DbFactoryBase)?.Factory);
+            _IDbContext = new Lazy<IDbContext>(() => (factory as DbFactoryBase)?.Factory);
 
             // Set the connection string, because it cannot be set by
             // the base class (due to the missing information)
@@ -70,14 +70,14 @@ namespace FluentMigrator.Runner.Processors
         }
 
         protected GenericProcessorBase(
-            [CanBeNull] Func<DbProviderFactory> factoryAccessor,
+            [CanBeNull] Func<IDbContext> factoryAccessor,
             [NotNull] IMigrationGenerator generator,
             [NotNull] ILogger logger,
             [NotNull] ProcessorOptions options,
             [NotNull] IConnectionStringAccessor connectionStringAccessor)
             : base(generator, logger, options)
         {
-            _dbProviderFactory = new Lazy<DbProviderFactory>(() => factoryAccessor?.Invoke());
+            _IDbContext = new Lazy<IDbContext>(() => factoryAccessor?.Invoke());
 
             var connectionString = connectionStringAccessor.ConnectionString;
 
@@ -94,9 +94,9 @@ namespace FluentMigrator.Runner.Processors
             _lazyConnection = new Lazy<IDbConnection>(
                 () =>
                 {
-                    if (DbProviderFactory == null)
+                    if (IDbContext == null)
                         return null;
-                    var connection = DbProviderFactory.CreateConnection();
+                    var connection = IDbContext.CreateConnection();
                     Debug.Assert(connection != null, nameof(Connection) + " != null");
                     connection.ConnectionString = connectionString;
                     connection.Open();
@@ -121,7 +121,7 @@ namespace FluentMigrator.Runner.Processors
         public IDbTransaction Transaction { get; protected set; }
 
         [CanBeNull]
-        protected DbProviderFactory DbProviderFactory => _dbProviderFactory.Value;
+        protected IDbContext IDbContext => _IDbContext.Value;
 
         protected virtual void EnsureConnectionIsOpen()
         {
@@ -195,9 +195,9 @@ namespace FluentMigrator.Runner.Processors
         protected virtual IDbCommand CreateCommand(string commandText, IDbConnection connection, IDbTransaction transaction)
         {
             IDbCommand result;
-            if (DbProviderFactory != null)
+            if (IDbContext != null)
             {
-                result = DbProviderFactory.CreateCommand();
+                result = IDbContext.CreateCommand();
                 Debug.Assert(result != null, nameof(result) + " != null");
                 result.Connection = connection;
                 if (transaction != null)
@@ -232,8 +232,8 @@ namespace FluentMigrator.Runner.Processors
             /// <inheritdoc />
             public IDbConnection CreateConnection(string connectionString)
             {
-                Debug.Assert(_processor.DbProviderFactory != null, "_processor.DbProviderFactory != null");
-                var result = _processor.DbProviderFactory.CreateConnection();
+                Debug.Assert(_processor.IDbContext != null, "_processor.IDbContext != null");
+                var result = _processor.IDbContext.CreateConnection();
                 Debug.Assert(result != null, nameof(result) + " != null");
                 result.ConnectionString = connectionString;
                 return result;

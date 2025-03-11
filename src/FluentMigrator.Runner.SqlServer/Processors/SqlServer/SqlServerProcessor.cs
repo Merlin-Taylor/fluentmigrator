@@ -82,13 +82,13 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             [NotNull] IOptionsSnapshot<ProcessorOptions> options,
             [NotNull] IConnectionStringAccessor connectionStringAccessor,
             [NotNull] IServiceProvider serviceProvider)
-            : this(databaseTypes, SqlClientFactory.Instance, generator, quoter, logger, options, connectionStringAccessor, serviceProvider)
+            : this(databaseTypes, SqlClientFactory.Instance.AsDbContext(), generator, quoter, logger, options, connectionStringAccessor, serviceProvider)
         {
         }
 
         protected SqlServerProcessor(
             [NotNull, ItemNotNull] IEnumerable<string> databaseTypes,
-            [NotNull] DbProviderFactory factory,
+            [NotNull] IDbContext factory,
             [NotNull] IMigrationGenerator generator,
             [NotNull] IQuoter quoter,
             [NotNull] ILogger logger,

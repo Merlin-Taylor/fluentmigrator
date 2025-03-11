@@ -33,7 +33,7 @@ namespace FluentMigrator.Runner.Processors
         private readonly IServiceProvider _serviceProvider;
         private readonly TestEntry[] _testEntries;
 
-        private DbProviderFactory _instance;
+        private IDbContext _instance;
 
         [Obsolete]
         public ReflectionBasedDbFactory(string assemblyName, string dbProviderFactoryTypeName)
@@ -63,7 +63,7 @@ namespace FluentMigrator.Runner.Processors
             _testEntries = testEntries;
         }
 
-        protected override DbProviderFactory CreateFactory()
+        protected override IDbContext CreateFactory()
         {
             if (_instance != null)
             {
@@ -73,8 +73,8 @@ namespace FluentMigrator.Runner.Processors
             var exceptions = new List<Exception>();
             if (TryCreateFactory(_serviceProvider, _testEntries, exceptions, out var factory))
             {
-                _instance = factory;
-                return factory;
+                _instance = factory.AsDbContext();
+                return _instance;
             }
 
             var assemblyNames = string.Join(", ", _testEntries.Select(x => x.AssemblyName));

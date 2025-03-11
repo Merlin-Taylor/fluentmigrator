@@ -27,13 +27,13 @@ namespace FluentMigrator.Runner.Processors.SqlServer
     public class SqlServerDbFactory : DbFactoryBase
     {
         public SqlServerDbFactory()
-            : base(SqlClientFactory.Instance)
+            : base(SqlClientFactory.Instance.AsDbContext())
         {
         }
 
-        protected override DbProviderFactory CreateFactory()
+        protected override IDbContext CreateFactory()
         {
-            return SqlClientFactory.Instance;
+            return SqlClientFactory.Instance.AsDbContext();
         }
     }
 }

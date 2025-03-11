@@ -70,12 +70,12 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             [NotNull] IOptionsSnapshot<ProcessorOptions> options,
             [NotNull] IConnectionStringAccessor connectionStringAccessor,
             [NotNull] IServiceProvider serviceProvider)
-            : this(SqlClientFactory.Instance, logger, generator, options, connectionStringAccessor, serviceProvider)
+            : this(SqlClientFactory.Instance.AsDbContext(), logger, generator, options, connectionStringAccessor, serviceProvider)
         {
         }
 
         protected SqlServer2000Processor(
-            DbProviderFactory factory,
+            IDbContext factory,
             [NotNull] ILogger logger,
             [NotNull] SqlServer2000Generator generator,
             [NotNull] IOptionsSnapshot<ProcessorOptions> options,
